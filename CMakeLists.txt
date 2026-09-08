@@ -141,8 +141,15 @@ if(GR4_ENABLE_SDR)
   find_package(SoapySDR CONFIG QUIET)
 endif()
 
+# add_ut_test()/setup_test() come from the installed core SDK
+# (gnuradio4Config.cmake includes GnuRadioTestHelpers.cmake), so there is no local copy to
+# drift out of sync with it.
+if(ENABLE_TESTING AND NOT COMMAND add_ut_test)
+  message(FATAL_ERROR "add_ut_test() is missing: the installed gnuradio4 core SDK predates GnuRadioTestHelpers.cmake. "
+                      "Reinstall core, or configure with -DENABLE_TESTING=OFF.")
+endif()
+
 if(ENABLE_TESTING)
-  include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/GnuRadioTestHelpers.cmake)
   add_test(NAME qa_BlockNamespaceConsistency COMMAND ${CMAKE_COMMAND} -DSOURCE_ROOT=${CMAKE_CURRENT_SOURCE_DIR} -P
                                                      ${CMAKE_CURRENT_SOURCE_DIR}/cmake/CheckBlockNamespaces.cmake)
 endif()
