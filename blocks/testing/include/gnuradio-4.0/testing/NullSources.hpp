@@ -6,6 +6,7 @@
 #include <gnuradio-4.0/DataSet.hpp>
 #include <gnuradio-4.0/Tensor.hpp>
 #include <gnuradio-4.0/meta/reflection.hpp>
+#include <gnuradio-4.0/meta/utils.hpp>
 
 #include <gnuradio-4.0/testing/NamespaceCompatibility.hpp>
 
@@ -116,10 +117,12 @@ Commonly used for testing and simulations where consistent output and finite exe
         if (n_samples_max > 0 && count >= n_samples_max) {
             this->requestStop();
         }
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-        return static_cast<T>(default_value.value) + static_cast<T>(count);
-#pragma GCC diagnostic pop
+        // For complex T the cast from the gr::Size_t counter would narrow implicitly inside
+        // std::complex's converting constructor, which -Wconversion and MSVC C4244 both flag.
+        // Going through T's fundamental value type makes that narrowing explicit instead of
+        // suppressing the diagnostic, and the result is identical for every registered T.
+        using value_t = meta::fundamental_base_value_type_t<T>;
+        return static_cast<T>(default_value.value) + static_cast<T>(static_cast<value_t>(count.value));
     }
 
     [[nodiscard]] constexpr auto processOne(meta::constexpr_value auto N) noexcept
