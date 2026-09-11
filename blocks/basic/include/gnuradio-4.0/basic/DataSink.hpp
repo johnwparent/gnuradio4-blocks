@@ -363,21 +363,19 @@ private:
     }
 };
 
-// The export attribute is load-bearing: this project builds with
-// CMAKE_CXX_VISIBILITY_PRESET=hidden and VISIBILITY_INLINES_HIDDEN=ON, which would otherwise
-// hide this inline function's local static (and its guard) in every shared object, giving each
-// plugin its own registry. Marking it default-visible lets the ELF flat namespace interpose a
-// single instance across the executable and all plugin .so files.
+// Declared here, defined once in gnuradio-datasink-core (src/DataSinkRegistry.cpp).
 //
-// NOTE: this does not hold on Windows, which has no symbol interposition -- every module that
-// includes this header gets its own DataSinkRegistry. Sinks instantiated inside a plugin DLL
-// are therefore invisible to a host application querying the registry. Consumers that keep
-// both sides in one binary (as the qa_DataSink tests do) are unaffected. Fixing this properly
-// requires moving the singleton out of line into a single exported shared library.
-GNURADIO_EXPORT inline DataSinkRegistry& globalDataSinkRegistry() {
-    static DataSinkRegistry instance;
-    return instance;
-}
+// The definition is deliberately out of line. An inline function with a local static gives every
+// module that includes this header its own copy on Windows, which has no symbol interposition, so
+// sinks registered inside a plugin DLL would be invisible to a host application polling the
+// registry. On ELF platforms the flat namespace merged those copies, provided the symbol was
+// default-visible -- this project builds with CMAKE_CXX_VISIBILITY_PRESET=hidden and
+// VISIBILITY_INLINES_HIDDEN=ON, so the previous definition needed an explicit export attribute to
+// achieve what a single out-of-line definition now gives on every platform.
+//
+// Consumers of this header therefore link gnuradio-datasink-core, which owns the one instance.
+// This mirrors how gnuradio-core exports globalBlockRegistry() from gnuradio-blocklib-core.
+GNURADIO_EXPORT DataSinkRegistry& globalDataSinkRegistry();
 
 namespace detail {
 
