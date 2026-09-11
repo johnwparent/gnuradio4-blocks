@@ -1,18 +1,15 @@
 function(add_timing_test TEST_NAME)
-  add_executable(${TEST_NAME} ${TEST_NAME}.cpp)
+  # add_ut_test() comes from core's GnuRadioTestHelpers and already supplies gnuradio-options,
+  # gnuradio-core, gnuradio-blocklib-core, ut and -- importantly here -- gnuradio-plugin, whose
+  # out-of-line gr_plugin_base destructor gnuradio-core's Graph/BlockModel/PluginLoader reference.
+  # It also registers the test by target file rather than by directory, which a multi-config
+  # generator needs, and sets the MSVC stack size and the Windows DLL search path.
+  add_ut_test(${TEST_NAME})
   target_include_directories(${TEST_NAME} PRIVATE ${CMAKE_BINARY_DIR}/include)
-  target_link_libraries(
-    ${TEST_NAME}
-    PRIVATE gnuradio-options
-            gnuradio-core
-            gnuradio-blocklib-core
-            gr-timing
-            gr-testing
-            ut)
+  target_link_libraries(${TEST_NAME} PRIVATE gr-timing gr-testing)
   if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(${TEST_NAME} PRIVATE util)
   endif()
-  add_test(NAME ${TEST_NAME} COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR} ${CMAKE_CURRENT_BINARY_DIR}/${TEST_NAME})
 endfunction()
 
 add_timing_test(qa_NMEAParser)

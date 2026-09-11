@@ -7,6 +7,7 @@ target_link_libraries(
   PRIVATE gnuradio-options
           gnuradio-core
           gnuradio-blocklib-core
+          gnuradio4::gnuradio-plugin
           gr-timing
           gr-testing)
 
