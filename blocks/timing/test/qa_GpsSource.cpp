@@ -102,7 +102,7 @@ const boost::ut::suite<"GpsSource"> gpsSourceTests = [] {
         auto& sink = testGraph.emplaceBlock<TagSink<std::uint8_t, ProcessFunction::USE_PROCESS_BULK>>({{"verbose_console", true}});
         expect(testGraph.connect<"out", "in">(gps, sink).has_value());
 
-        gr::scheduler::Simple sched;
+        gr::scheduler::Simple<> sched;
         expect(sched.exchange(std::move(testGraph)).has_value());
 
         auto schedThread = std::thread([&sched] { (void)sched.runAndWait(); });
@@ -152,7 +152,7 @@ const boost::ut::suite<"GpsSource"> gpsSourceTests = [] {
         auto& sink = testGraph.emplaceBlock<TagSink<std::uint8_t, ProcessFunction::USE_PROCESS_BULK>>({{"verbose_console", true}});
         expect(testGraph.connect<"out", "in">(gps, sink).has_value());
 
-        gr::scheduler::Simple sched;
+        gr::scheduler::Simple<> sched;
         expect(sched.exchange(std::move(testGraph)).has_value());
 
         auto schedThread = std::thread([&sched] { (void)sched.runAndWait(); });
@@ -185,7 +185,7 @@ const boost::ut::suite<"GpsSource"> gpsSourceTests = [] {
         auto& sink = testGraph.emplaceBlock<TagSink<std::uint8_t, ProcessFunction::USE_PROCESS_BULK>>({{"verbose_console", true}});
         expect(testGraph.connect<"out", "in">(gps, sink).has_value());
 
-        gr::scheduler::Simple sched;
+        gr::scheduler::Simple<> sched;
         expect(sched.exchange(std::move(testGraph)).has_value());
 
         auto schedThread = std::thread([&sched] { (void)sched.runAndWait(); });
@@ -220,7 +220,7 @@ const boost::ut::suite<"GpsSource"> gpsSourceTests = [] {
         auto& sink = testGraph.emplaceBlock<TagSink<std::uint8_t, ProcessFunction::USE_PROCESS_BULK>>({{"verbose_console", true}});
         expect(testGraph.connect<"out", "in">(gps, sink).has_value());
 
-        gr::scheduler::Simple sched;
+        gr::scheduler::Simple<> sched;
         expect(sched.exchange(std::move(testGraph)).has_value());
 
         auto schedThread = std::thread([&sched] { (void)sched.runAndWait(); });
@@ -262,7 +262,7 @@ const boost::ut::suite<"GpsSource"> gpsSourceTests = [] {
         auto& sink = testGraph.emplaceBlock<TagSink<std::uint8_t, ProcessFunction::USE_PROCESS_BULK>>({{"verbose_console", true}});
         expect(testGraph.connect<"out", "in">(gps, sink).has_value());
 
-        gr::scheduler::Simple sched;
+        gr::scheduler::Simple<> sched;
         expect(sched.exchange(std::move(testGraph)).has_value());
 
         auto schedThread = std::thread([&sched] { (void)sched.runAndWait(); });

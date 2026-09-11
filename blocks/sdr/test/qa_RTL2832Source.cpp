@@ -313,7 +313,7 @@ const boost::ut::suite<"RTL2832Source"> rtl2832Tests = [] {
         });
         expect(testGraph.connect<"out", "in">(src, sink).has_value());
 
-        gr::scheduler::Simple sched;
+        gr::scheduler::Simple<> sched;
         expect(sched.exchange(std::move(testGraph)).has_value());
 
         auto schedThread = std::thread([&sched] { (void)sched.runAndWait(); });
@@ -364,7 +364,7 @@ const boost::ut::suite<"RTL2832Source"> rtl2832Tests = [] {
         });
         expect(testGraph.connect<"out", "in">(src, sink).has_value());
 
-        gr::scheduler::Simple sched;
+        gr::scheduler::Simple<> sched;
         expect(sched.exchange(std::move(testGraph)).has_value());
 
         auto schedThread = std::thread([&sched] { (void)sched.runAndWait(); });
@@ -409,7 +409,7 @@ const boost::ut::suite<"RTL2832Source"> rtl2832Tests = [] {
         });
         expect(testGraph.connect<"out", "in">(src, sink).has_value());
 
-        gr::scheduler::Simple sched;
+        gr::scheduler::Simple<> sched;
         expect(sched.exchange(std::move(testGraph)).has_value());
 
         auto schedThread = std::thread([&sched] { (void)sched.runAndWait(); });
@@ -523,7 +523,7 @@ const boost::ut::suite<"RTL2832Source"> rtl2832Tests = [] {
         });
         expect(testGraph.connect<"out", "in">(src, sink).has_value());
 
-        gr::scheduler::Simple sched;
+        gr::scheduler::Simple<> sched;
         expect(sched.exchange(std::move(testGraph)).has_value());
 
         auto schedThread = std::thread([&sched] { (void)sched.runAndWait(); });
@@ -563,7 +563,7 @@ const boost::ut::suite<"RTL2832Source"> rtl2832Tests = [] {
         });
         expect(testGraph.connect<"out", "in">(src, sink).has_value());
 
-        gr::scheduler::Simple sched;
+        gr::scheduler::Simple<> sched;
         expect(sched.exchange(std::move(testGraph)).has_value());
 
         auto schedThread = std::thread([&sched] { (void)sched.runAndWait(); });
@@ -614,7 +614,7 @@ const boost::ut::suite<"RTL2832Source"> rtl2832Tests = [] {
         expect(testGraph.connect<"out", "clk_in">(pps, rtl).has_value());
         expect(testGraph.connect<"out", "in">(rtl, sink).has_value());
 
-        gr::scheduler::Simple sched;
+        gr::scheduler::Simple<> sched;
         expect(sched.exchange(std::move(testGraph)).has_value());
 
         auto schedThread = std::thread([&sched] { (void)sched.runAndWait(); });
@@ -695,7 +695,7 @@ const boost::ut::suite<"RTL2832Source"> rtl2832Tests = [] {
         expect(testGraph.connect<"out", "clk_in">(gps, rtl).has_value());
         expect(testGraph.connect<"out", "in">(rtl, sink).has_value());
 
-        gr::scheduler::Simple sched;
+        gr::scheduler::Simple<> sched;
         expect(sched.exchange(std::move(testGraph)).has_value());
 
         auto schedThread = std::thread([&sched] { (void)sched.runAndWait(); });

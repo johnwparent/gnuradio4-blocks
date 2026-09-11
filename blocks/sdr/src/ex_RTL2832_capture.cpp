@@ -49,7 +49,7 @@ void runCapture() {
         return;
     }
 
-    scheduler::Simple sched;
+    scheduler::Simple<> sched;
     if (!sched.exchange(std::move(graph)).has_value()) {
         std::println(stderr, "[RTL2832] scheduler init failed");
         return;
