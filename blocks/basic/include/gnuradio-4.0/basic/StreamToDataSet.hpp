@@ -53,7 +53,14 @@ StreamToDataSet output:
     using A = Annotated<U, description, Arguments...>;
 
     // port definitions
-    using OutType = std::conditional_t<streamOut, T, DataSet<T>>;
+    // The axis this block writes is time in seconds, so it has to hold fractions whatever the
+    // samples are: with the axis typed as T, a StreamToDataSet<std::int32_t> at 1 kHz truncated
+    // every timestamp to a whole second, and for std::complex<float> the axis was complex.
+    // A sample type that can already represent time is kept, so DataSet<float> and DataSet<double>
+    // outputs are unchanged and every existing connection still type-checks; the rest fall back to
+    // double, which unlike float still resolves microseconds after hours of capture.
+    using DataSetType = DataSet<T, std::conditional_t<std::is_floating_point_v<T>, T, double>>;
+    using OutType     = std::conditional_t<streamOut, T, DataSetType>;
     PortIn<T>               in;
     PortOut<OutType, Async> out;
 
@@ -127,7 +134,7 @@ StreamToDataSet output:
     };
 
     std::conditional_t<streamOut, AccumulationState, std::deque<AccumulationState>> _accState{};
-    std::deque<DataSet<T>>                                                          _tempDataSets;
+    std::deque<DataSetType>                                                         _tempDataSets;
     std::conditional_t<streamOut, property_map, std::deque<property_map>>           _filterState;
 
     void reset() {
@@ -542,14 +549,17 @@ private:
         }
     }
 
-    void fillAxisValues(DataSet<T>& ds, int start, std::size_t nSamples) {
+    void fillAxisValues(DataSetType& ds, int start, std::size_t nSamples) {
         ds.axis_values[0].reserve(ds.axis_values[0].size() + nSamples);
         for (int j = 0; j < static_cast<int>(nSamples); j++) {
-            ds.axis_values[0].emplace_back(static_cast<float>(start + j) / sample_rate);
+            // computed in double regardless of the axis type, so the division keeps its precision,
+            // then converted explicitly to whatever the axis holds
+            using AxisT = typename DataSetType::axis_value_type;
+            ds.axis_values[0].emplace_back(static_cast<AxisT>(static_cast<double>(start + j) / static_cast<double>(sample_rate)));
         }
     }
 
-    void initNewDataSet(DataSet<T>& dataSet) const {
+    void initNewDataSet(DataSetType& dataSet) const {
         dataSet.axis_names.emplace_back("time");
         dataSet.axis_units.emplace_back("s");
         dataSet.axis_values.resize(1UZ);
