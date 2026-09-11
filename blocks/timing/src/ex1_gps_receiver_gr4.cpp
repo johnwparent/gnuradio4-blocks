@@ -38,7 +38,7 @@ void runGraph(std::string_view devicePath) {
         return;
     }
 
-    scheduler::Simple sched;
+    scheduler::Simple<> sched;
     if (!sched.exchange(std::move(graph)).has_value()) {
         std::println(stderr, "[GPS-GR4] scheduler init failed");
         return;
