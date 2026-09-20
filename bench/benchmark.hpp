@@ -96,6 +96,10 @@ BENCHMARK_ALWAYS_INLINE void force_to_memory(T& x, Ts&... more) {
     // GNU compatible compilers need to support this part
     // NOLINTNEXTLINE(hicpp-no-assembler)
     asm volatile("" : "+m"(x));
+#elif _MSC_VER
+    // MSVC 64bit does not allow assembly inlining
+    const T* volatile p = &x;
+    (void)p;
 #else
     const volatile T y = x;
     x                  = y;
@@ -773,7 +777,7 @@ public:
             const auto        ns                  = stop_iter[N_ITERATIONS - 1] - start;
             const long double duration_s          = 1e-9L * static_cast<long double>(ns.count());
 
-            const auto add_statistics = [&]<typename T>(ResultMap& map, const T& time_diff) {
+            const auto add_statistics = [&]<typename T>(ResultMap& map, const T& [[maybe_unused]] time_diff) {
                 if constexpr (N_ITERATIONS != 1) {
                     const auto [min, mean, stddev, median, max] = utils::compute_statistics(time_diff);
                     map.try_emplace("min", min, "s", _precision);
@@ -1008,6 +1012,6 @@ public:
 } // namespace cfg
 
 template<>
-inline auto boost::ut::cfg<boost::ut::override> = ut::runner<cfg::reporter<printer>>{};
+inline auto boost::ut::cfg<boost::ut::override> = boost::ut::runner<cfg::reporter<boost::ut::printer>>{};
 
 #endif // GNURADIO_BENCHMARK_HPP
