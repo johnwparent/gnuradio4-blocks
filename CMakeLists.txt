@@ -17,11 +17,13 @@ find_package(PkgConfig QUIET)
 
 option(ENABLE_EXAMPLES "Enable example builds" ON)
 option(ENABLE_TESTING "Enable test builds" ON)
+option(ENABLE_BENCH "Enable benchmark builds" ON)
 option(GR4_ENABLE_AUDIO "Build the audio block family" OFF)
 option(GR4_ENABLE_SDR "Build the SDR block family" OFF)
 option(GR4_ENABLE_HTTP_TESTS "Build HTTP integration tests" OFF)
 option(GR_USE_FETCHCONTENT_DEPS "Allow CMake to download selected third-party dependencies with FetchContent" OFF)
 option(USE_CCACHE "Use ccache if available" ON)
+option(GR_PACKAGING "Allow GNU Radio 4 blocks to be packaged with CPack" OFF)
 
 # Keep the largest template-heavy test compilations from overlapping. This limits only targets assigned to the pool;
 # other Ninja work remains parallel.
@@ -154,7 +156,9 @@ if(ENABLE_TESTING)
                                                      ${CMAKE_CURRENT_SOURCE_DIR}/cmake/CheckBlockNamespaces.cmake)
 endif()
 
-add_subdirectory(bench)
+if(ENABLE_BENCH)
+  add_subdirectory(bench)
+endif()
 add_subdirectory(blocks)
 
 if(ENABLE_TESTING AND CMAKE_GENERATOR MATCHES "Ninja")
@@ -190,3 +194,7 @@ install(
   EXPORT ${GR4_EXPORT_NAME}
   NAMESPACE gnuradio4::
   DESTINATION "${GR4_CMAKE_INSTALL_DIR}")
+
+if(GR_PACKAGING)
+  include(cmake/CPackConfig.cmake)
+endif()
