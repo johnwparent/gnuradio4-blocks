@@ -22,7 +22,9 @@ cpack_add_component(
 cpack_add_component(DEVELOP DISPLAY_NAME "Development files"
                     DESCRIPTION "Headers, import libraries and CMake/pkg-config files needed to build against GR 4")
 
-if(UNIX)
+# APPLE implies UNIX, so macOS must be excluded here or it selects the Debian
+# generator and `--target package` tries to build a .deb on a Mac.
+if(UNIX AND NOT APPLE)
   if(NOT CPACK_GENERATOR)
     set(CPACK_GENERATOR "DEB")
   endif()
@@ -35,6 +37,32 @@ if(UNIX)
   if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
     set(CPACK_DEBIAN_DEBUGINFO_PACKAGE ON)
   endif()
+endif()
+
+if(APPLE)
+  set(CPACK_GENERATOR "productbuild")
+  # gr_configure_productbuild_installer() comes from gr-core's installed
+  # GrProductBuild.cmake, which gnuradio4Config.cmake includes on APPLE.
+  #
+  # Same reason as the Windows branch below: gr-blocks installs without
+  # COMPONENT, so everything lands in Unspecified and a CORE/DEVELOP split would
+  # ship empty components. Unspecified is therefore also the component that
+  # carries the manifest registration -- REGISTER_COMPONENT must name one that
+  # actually installs files, or gr-blocks would never appear in the manifest.
+  set(CPACK_COMPONENTS_ALL Unspecified)
+  set(CPACK_COMPONENT_UNSPECIFIED_DISPLAY_NAME "Runtime")
+
+  # the identifier identifies gr-blocks to pkgutil across releases: never reuse
+  # it in another GR installer and never change it between versions
+  gr_configure_productbuild_installer(
+    IDENTIFIER
+    "org.gnuradio.gr4.blocks"
+    PACKAGES
+    "gr-blocks=${CPACK_PACKAGE_VERSION}"
+    REGISTER_COMPONENT
+    Unspecified
+    PRESELECTED_COMPONENTS
+    Unspecified)
 endif()
 
 if(WIN32)
