@@ -1,0 +1,41 @@
+find_package(gnuradio4 CONFIG REQUIRED)
+find_package(gnuradio4Library CONFIG REQUIRED)
+find_package(GnuRadioBlockLib CONFIG REQUIRED)
+
+if(NOT TARGET gnuradio-core AND TARGET gnuradio4::gnuradio-core)
+  add_library(gnuradio-core ALIAS gnuradio4::gnuradio-core)
+endif()
+if(NOT TARGET gnuradio-algorithm AND TARGET gnuradio4::gnuradio-algorithm)
+  add_library(gnuradio-algorithm ALIAS gnuradio4::gnuradio-algorithm)
+endif()
+if(NOT TARGET gnuradio-options AND TARGET gnuradio4::gnuradio-options)
+  add_library(gnuradio-options ALIAS gnuradio4::gnuradio-options)
+endif()
+if(NOT TARGET gnuradio-blocklib-core AND TARGET gnuradio4::gnuradio-blocklib-core)
+  add_library(gnuradio-blocklib-core ALIAS gnuradio4::gnuradio-blocklib-core)
+endif()
+if(NOT TARGET gnuradio-plugin AND TARGET gnuradio4::gnuradio-plugin)
+  add_library(gnuradio-plugin ALIAS gnuradio4::gnuradio-plugin)
+endif()
+if(NOT TARGET ut-benchmark AND TARGET gnuradio4::ut-benchmark)
+  add_library(ut-benchmark ALIAS gnuradio4::ut-benchmark)
+endif()
+
+if(ENABLE_TESTING OR ENABLE_EXAMPLES OR ENABLE_BENCHMAKRING)
+  ObtainOrFindUT()
+endif()
+
+if(EMSCRIPTEN AND TARGET ut)
+  SetupUtTargetForEmscripten()
+endif()
+
+if(NOT TARGET Boost::ut AND TARGET ut)
+  add_library(Boost::ut ALIAS ut)
+endif()
+
+ObtainOrFindHttpLib()
+
+if(GR4_ENABLE_SDR)
+  find_package(SoapySDR CONFIG QUIET)
+endif()
+
